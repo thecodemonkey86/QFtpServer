@@ -1,6 +1,8 @@
 #ifndef FTPSERVER_H
 #define FTPSERVER_H
 
+#include "ftpconfig.h"
+
 #include <QObject>
 #include <QSet>
 #include <qftpserverlib_global.h>
@@ -14,8 +16,8 @@ class QFTPSERVERLIBSHARED_EXPORT FtpServer : public QObject
 {
     Q_OBJECT
 public:
-    explicit FtpServer(QObject *parent, const QString &rootPath, int port = 21,
-                       const QString &userName = QString(), const QString &password = QString(),
+    explicit FtpServer(QObject *parent,
+                       const QHash<QString, FtpConfig> & usersConfigMapping, int port = 21,
                        bool readOnly = false, bool onlyOneIpAllowed = false);
 
     // Whether or not the server is listening for incoming connections. If it
@@ -39,16 +41,8 @@ private slots:
     void startNewControlConnection();
 
 private:
-    // If both username and password are empty, it means anonymous mode - any
-    // username and password combination will be accepted.
-    QString userName;
-    QString password;
-
-    // The root path is the virtual root directory of the FTP. It works like
-    // chroot (see http://en.wikipedia.org/wiki/Chroot). The FTP server will
-    // not access files or folders that are not in this folder or any of its
-    // subfolders.
-    QString rootPath;
+    // mapping user name to FTP server configuration, which contains password and root path for that user
+    QHash<QString, FtpConfig> usersConfigMapping;
 
     // The SSL server listen for incoming connections.
     SslServer *server;

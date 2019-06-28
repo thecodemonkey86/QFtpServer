@@ -1,6 +1,8 @@
 #ifndef FTPCONTROLCONNECTION_H
 #define FTPCONTROLCONNECTION_H
 
+#include "ftpconfig.h"
+
 #include <QObject>
 #include <QPointer>
 
@@ -17,7 +19,7 @@ class FtpControlConnection : public QObject
 {
     Q_OBJECT
 public:
-    explicit FtpControlConnection(QObject *parent, QSslSocket *socket, const QString &rootPath, const QString &userName = QString(), const QString &password = QString(), bool readOnly = false);
+    explicit FtpControlConnection(QObject *parent, QSslSocket *socket, const QHash<QString, FtpConfig> & usersConfigsMapping, bool readOnly = false);
     ~FtpControlConnection();
 
 signals:
@@ -98,17 +100,16 @@ private:
     QSslSocket *socket;
     // The current directory (i.e. CD) of the FTP server. Used for relative
     // paths.
-    QString currentDirectory;
+    QString currentDirectory, currentUser;
     // Some commands depend on the previous command (for example RNFR/RNTO,
     // REST/STOR, etc.).
     QString lastProcessedCommand;
     // Flag whether the FTP client has logged (provided a username/password) or not yet.
     bool isLoggedIn;
-    // The username that the FTP server expects.
-    QString userName;
-    // The password that the FTP server expects.
-    QString password;
-    QString rootPath;
+
+    // username -> config mappings
+    QHash<QString, FtpConfig> usersConfigsMappings;
+
     // Flag for whether we should encrypt data connections.
     bool encryptDataConnection;
     DataConnection *dataConnection;

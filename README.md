@@ -3,9 +3,8 @@ QFtpServer - an FTP server written in Qt
 
 ### Description
 
-QFtpServer is an event-driven server which is written entirely in Qt. It is non-blocking and supports multiple connections.
+forked from https://github.com/sashoalm/QFtpServer, added support for multiple user/password/rootpath configurations
 
-This project started because I couldn't find a free FTP server for my Symbian phone so I decided to try and make one of my own.  I've tested it against Filezilla, Chrome, Firefox, Safari, Windows Explorer, and others.
 
 ### Features
 
@@ -15,12 +14,24 @@ It supports:
 * Passive connections (PASV command).
 * Random access for files (APPE, RETR), so stopped uploads and downloads can be continued.
 * Secure FTP, also known as FTP-ES which uses SSL/TLS sockets.
+* Multiple user accounts
 
 It doesn't support:
 * IPv6.
 * FTPS (this standard is obsolete and FTP-ES should be used instead).
-* Multiple user accounts.
 
 ### Example usage:
 
-    server = new FtpServer(this, "/ftp/root/path", 21, "MyUserName", "MyPassword", false, false);
+    const QString &userName("u0");
+    const QString &password("123");
+    const QString &rootPath("D:\\ftpserver\\root1");
+
+    const QString &userName2("u1");
+    const QString &password2("456");
+    const QString &rootPath2("D:\\ftpserver\\root2");
+
+    QHash<QString, FtpConfig> usersConfigsMappings;
+    usersConfigsMappings.insert(userName, FtpConfig(rootPath, password));
+    usersConfigsMappings.insert(userName2, FtpConfig(rootPath2, password2));
+   
+    FtpServer server(&a, usersConfigsMappings, 21, false, false);

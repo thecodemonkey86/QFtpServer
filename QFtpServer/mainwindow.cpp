@@ -6,6 +6,7 @@
 #include <QCoreApplication>
 #include <QSettings>
 #include <QFileDialog>
+#include <QIntValidator>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow)
@@ -145,9 +146,10 @@ void MainWindow::startServer()
         userName = ui->lineEditUserName->text();
         password = ui->lineEditPassword->text();
     }
+    QHash<QString, FtpConfig> usersConfigsMappings;
+    usersConfigsMappings.insert(userName, FtpConfig(ui->lineEditRootPath->text(), password));
     delete server;
-    server = new FtpServer(this, ui->lineEditRootPath->text(), ui->lineEditPort->text().toInt(), userName,
-                           password, ui->checkBoxReadOnly->isChecked(), ui->checkBoxOnlyOneIpAllowed->isChecked());
+    server = new FtpServer(this,usersConfigsMappings , ui->lineEditPort->text().toInt(), ui->checkBoxReadOnly->isChecked(), ui->checkBoxOnlyOneIpAllowed->isChecked());
     connect(server, SIGNAL(newPeerIp(QString)), SLOT(onPeerIpChanged(QString)));
     if (server->isListening()) {
         ui->statusBar->showMessage("Listening at " + FtpServer::lanIp());

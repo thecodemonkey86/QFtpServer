@@ -15,13 +15,11 @@
 #include <QTimer>
 #include <QSslSocket>
 
-FtpControlConnection::FtpControlConnection(QObject *parent, QSslSocket *socket, const QString &rootPath, const QString &userName, const QString &password, bool readOnly) :
+FtpControlConnection::FtpControlConnection(QObject *parent, QSslSocket *socket, const QHash<QString, FtpConfig> & usersConfigsMappings, bool readOnly) :
     QObject(parent)
 {
     this->socket = socket;
-    this->userName = userName;
-    this->password = password;
-    this->rootPath = rootPath;
+    this->usersConfigsMappings = usersConfigsMappings;
     this->readOnly = readOnly;
     isLoggedIn = false;
     encryptDataConnection = false;
@@ -148,7 +146,7 @@ QString FtpControlConnection::toLocalPath(const QString &fileName) const
     }
 
     // Prepend the root path.
-    localPath = QDir::cleanPath(rootPath + '/' + components.join("/"));
+    localPath = QDir::cleanPath(usersConfigsMappings[currentUser].getRootPath() + '/' + components.join("/"));
 
     qDebug() << "to local path" << fileName << "->" << localPath;
     return localPath;
@@ -367,12 +365,17 @@ void FtpControlConnection::pass(const QString &password)
     QString command;
     QString commandParameters;
     parseCommand(lastProcessedCommand, &command, &commandParameters);
-    if (this->password.isEmpty() || ("USER" == command && this->userName == commandParameters && this->password == password)) {
+
+    isLoggedIn = false;
+
+    if (usersConfigsMappings.contains(commandParameters) && (usersConfigsMappings[commandParameters].getPassword().isEmpty() || ("USER" == command && usersConfigsMappings[commandParameters].getPassword() == password))) {
         reply("230 You are logged in.");
         isLoggedIn = true;
+        currentUser = commandParameters;
     } else {
-        reply("530 User name or password was incorrect.");
+         reply("530 User name or password was incorrect.");
     }
+
 }
 
 void FtpControlConnection::auth()

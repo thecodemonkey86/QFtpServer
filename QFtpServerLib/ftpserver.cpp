@@ -1,12 +1,13 @@
 #include "ftpserver.h"
 #include "ftpcontrolconnection.h"
 #include "sslserver.h"
+#include "ftpconfig.h"
 
 #include <QDebug>
 #include <QNetworkInterface>
 #include <QSslSocket>
 
-FtpServer::FtpServer(QObject *parent, const QString &rootPath, int port, const QString &userName, const QString &password, bool readOnly, bool onlyOneIpAllowed) :
+FtpServer::FtpServer(QObject *parent, const QHash<QString, FtpConfig> & usersConfigMapping, int port,  bool readOnly, bool onlyOneIpAllowed) :
     QObject(parent)
 {
     server = new SslServer(this);
@@ -19,9 +20,7 @@ FtpServer::FtpServer(QObject *parent, const QString &rootPath, int port, const Q
     server->listen(QHostAddress::Any, port);
 #endif
     connect(server, SIGNAL(newConnection()), this, SLOT(startNewControlConnection()));
-    this->userName = userName;
-    this->password = password;
-    this->rootPath = rootPath;
+    this->usersConfigMapping = usersConfigMapping;
     this->readOnly = readOnly;
     this->onlyOneIpAllowed = onlyOneIpAllowed;
 }
@@ -61,5 +60,5 @@ void FtpServer::startNewControlConnection()
     }
 
     // Create a new FTP control connection on this socket.
-    new FtpControlConnection(this, socket, rootPath, userName, password, readOnly);
+    new FtpControlConnection(this, socket, usersConfigMapping, readOnly);
 }

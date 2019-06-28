@@ -29,8 +29,10 @@ int main(int argc, char *argv[])
     const QString &password = getRandomString(3);
     const QString &rootPath = QDir::currentPath();
 
+    QHash<QString, FtpConfig> usersConfigsMappings;
+    usersConfigsMappings.insert(userName, FtpConfig(rootPath, password));
     // *TODO: Allow using port 0.
-    FtpServer server(&a, rootPath, 2121, userName, password, false, false);
+    FtpServer server(&a, usersConfigsMappings, 2121, false, false);
     if (server.isListening()) {
         qDebug() << QString("Listening at %1:2121").arg(FtpServer::lanIp()).toStdString().c_str();
         qDebug() << QString("User: %1").arg(userName).toStdString().c_str();

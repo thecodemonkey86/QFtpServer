@@ -16,6 +16,7 @@ DEFINES += QFTPSERVERLIB_LIBRARY
 SOURCES += \
     dataconnection.cpp \
     ftpcommand.cpp \
+    ftpconfig.cpp \
     ftpcontrolconnection.cpp \
     ftplistcommand.cpp \
     ftpretrcommand.cpp \
@@ -24,6 +25,7 @@ SOURCES += \
     sslserver.cpp
 
 HEADERS +=\
+    ftpconfig.h \
         qftpserverlib_global.h \
     dataconnection.h \
     ftpcommand.h \

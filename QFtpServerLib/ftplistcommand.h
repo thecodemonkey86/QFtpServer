@@ -3,7 +3,6 @@
 
 #include "ftpcommand.h"
 
-class QTimer;
 class QFileInfo;
 typedef QList<QFileInfo> QFileInfoList;
 
@@ -21,15 +20,13 @@ private:
     void startImplementation();
     QString fileListingString(const QFileInfo &fi);
 
-private slots:
+private :
     void listNextBatch();
 
 private:
     QString listDirectory;
     bool nameListOnly;
-    QTimer *timer;
-    QFileInfoList *list;
-    int index;
+    //int index;*/
 };
 
 #endif // FTPLISTCOMMAND_H

@@ -32,8 +32,8 @@ void FtpListCommand::startImplementation()
 
     emit reply("150 File status okay; about to open data connection.");
 
-    index = 0;
-    list = new QFileInfoList;
+   // index = 0;
+   /* list = new QFileInfoList;
     if (!info.isDir()) {
         *list = (QFileInfoList() << info);
     } else {
@@ -43,7 +43,12 @@ void FtpListCommand::startImplementation()
     // Start the timer.
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(listNextBatch()));
-    timer->start(0);
+    timer->start(0);*/
+    auto list = !info.isDir() ? (QFileInfoList() << info) : QDir(listDirectory).entryInfoList();
+    for(const auto & l : list)
+         socket->write(fileListingString(l).toUtf8());
+
+     socket->disconnectFromHost();
 }
 
 QString padded(QString s, int n)
@@ -111,7 +116,7 @@ QString FtpListCommand::fileListingString(const QFileInfo &fi)
     return line;
 }
 
-void FtpListCommand::listNextBatch()
+/*void FtpListCommand::listNextBatch()
 {
     // List next 10 items.
     int stop = qMin(index + 10, list->size());
@@ -127,4 +132,4 @@ void FtpListCommand::listNextBatch()
         timer->stop();
         socket->disconnectFromHost();
     }
-}
+}*/

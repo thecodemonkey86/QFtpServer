@@ -6,7 +6,7 @@
 #include <QObject>
 #include <QSet>
 #include <qftpserverlib_global.h>
-
+#include "sslcertdata.h"
 class SslServer;
 
 // The ftp server. Listens on a port, and starts a new control connection each
@@ -17,7 +17,12 @@ class QFTPSERVERLIBSHARED_EXPORT FtpServer : public QObject
     Q_OBJECT
 public:
     explicit FtpServer(QObject *parent,
-                       const QHash<QString, FtpConfig> & usersConfigMapping, int port = 21,
+                       const QHash<QString, FtpConfig> & usersConfigMapping, quint16 port = 21,
+                       bool readOnly = false, bool onlyOneIpAllowed = false);
+    explicit FtpServer(QObject *parent,
+                       const QHash<QString, FtpConfig> & usersConfigMapping,
+                        const SslCertData & certData,
+                        quint16 port = 21,
                        bool readOnly = false, bool onlyOneIpAllowed = false);
 
     // Whether or not the server is listening for incoming connections. If it
@@ -59,6 +64,8 @@ private:
     // refuse connections from any other IP. This makes sense because a mobile
     // phone is unlikely to be used from 2 places at once.
     bool onlyOneIpAllowed;
+
+    SslCertData certData;
 };
 
 #endif // FTPSERVER_H

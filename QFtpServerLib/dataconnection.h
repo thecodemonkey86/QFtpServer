@@ -5,6 +5,8 @@ class SslServer;
 class QSslSocket;
 class FtpCommand;
 
+#include "sslcertdata.h"
+
 #include <QObject>
 #include <QPointer>
 
@@ -22,11 +24,11 @@ class DataConnection : public QObject
 {
     Q_OBJECT
 public:
-    explicit DataConnection(QObject *parent = 0);
+    explicit DataConnection(const  SslCertData & certData,QObject *parent = nullptr);
 
     // Connects to a host. Any existing data connections
     // or commands are aborted.
-    void scheduleConnectToHost(const QString &hostName, int port, bool encrypt);
+    void scheduleConnectToHost(const QString &hostName, quint16 port, bool encrypt);
 
     // Starts listening for new data connections. Any existing data connections
     // or commands are aborted.
@@ -59,7 +61,8 @@ private:
     // Used for the active data connection (PORT command).
     bool isActiveConnection;
     QString hostName;
-    int port;
+    quint16 port;
+    SslCertData certData;
 };
 
 #endif // PASSIVEDATACONNECTION_H

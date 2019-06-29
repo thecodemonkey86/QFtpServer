@@ -2,6 +2,7 @@
 #define FTPCONTROLCONNECTION_H
 
 #include "ftpconfig.h"
+#include "sslcertdata.h"
 
 #include <QObject>
 #include <QPointer>
@@ -19,7 +20,7 @@ class FtpControlConnection : public QObject
 {
     Q_OBJECT
 public:
-    explicit FtpControlConnection(QObject *parent, QSslSocket *socket, const QHash<QString, FtpConfig> & usersConfigsMapping, bool readOnly = false);
+    explicit FtpControlConnection(QObject *parent, QSslSocket *socket,  const SslCertData & certData, const QHash<QString, FtpConfig> & usersConfigsMapping, bool readOnly = false);
     ~FtpControlConnection();
 
 signals:
@@ -116,6 +117,8 @@ private:
     // Flag whether the client is allowed only read-only access (can download,
     // but not upload/modify).
     bool readOnly;
+
+    SslCertData certData;
 };
 
 #endif // FTPCONTROLCONNECTION_H

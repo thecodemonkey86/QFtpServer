@@ -22,6 +22,7 @@ SOURCES += \
     ftpretrcommand.cpp \
     ftpserver.cpp \
     ftpstorcommand.cpp \
+    sslcertdata.cpp \
     sslserver.cpp
 
 HEADERS +=\
@@ -34,6 +35,7 @@ HEADERS +=\
     ftpretrcommand.h \
     ftpserver.h \
     ftpstorcommand.h \
+    sslcertdata.h \
     sslserver.h
 
 unix {

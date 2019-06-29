@@ -7,7 +7,7 @@
 #include <QNetworkInterface>
 #include <QSslSocket>
 
-FtpServer::FtpServer(QObject *parent, const QHash<QString, FtpConfig> & usersConfigMapping, int port,  bool readOnly, bool onlyOneIpAllowed) :
+FtpServer::FtpServer(QObject *parent, const QHash<QString, FtpConfig> & usersConfigMapping, quint16 port,  bool readOnly, bool onlyOneIpAllowed) :
     QObject(parent)
 {
     server = new SslServer(this);
@@ -23,6 +23,12 @@ FtpServer::FtpServer(QObject *parent, const QHash<QString, FtpConfig> & usersCon
     this->usersConfigMapping = usersConfigMapping;
     this->readOnly = readOnly;
     this->onlyOneIpAllowed = onlyOneIpAllowed;
+}
+
+FtpServer::FtpServer(QObject *parent, const QHash<QString, FtpConfig> &usersConfigMapping, const SslCertData & certData, quint16 port, bool readOnly, bool onlyOneIpAllowed)
+:FtpServer(parent, usersConfigMapping, port,  readOnly, onlyOneIpAllowed)
+{
+    this->certData = certData;
 }
 
 bool FtpServer::isListening()
@@ -42,7 +48,7 @@ QString FtpServer::lanIp()
 
 void FtpServer::startNewControlConnection()
 {
-    QSslSocket *socket = (QSslSocket *) server->nextPendingConnection();
+    QSslSocket *socket = static_cast<QSslSocket *>(server->nextPendingConnection());
 
     // If this is not a previously encountered IP emit the newPeerIp signal.
     QString peerIp = socket->peerAddress().toString();
@@ -60,5 +66,5 @@ void FtpServer::startNewControlConnection()
     }
 
     // Create a new FTP control connection on this socket.
-    new FtpControlConnection(this, socket, usersConfigMapping, readOnly);
+    new FtpControlConnection(this, socket, certData, usersConfigMapping, readOnly);
 }

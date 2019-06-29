@@ -15,7 +15,7 @@
 #include <QTimer>
 #include <QSslSocket>
 
-FtpControlConnection::FtpControlConnection(QObject *parent, QSslSocket *socket, const QHash<QString, FtpConfig> & usersConfigsMappings, bool readOnly) :
+FtpControlConnection::FtpControlConnection(QObject *parent, QSslSocket *socket, const SslCertData &certData, const QHash<QString, FtpConfig> & usersConfigsMappings, bool readOnly) :
     QObject(parent)
 {
     this->socket = socket;
@@ -27,7 +27,8 @@ FtpControlConnection::FtpControlConnection(QObject *parent, QSslSocket *socket, 
     connect(socket, SIGNAL(readyRead()), this, SLOT(acceptNewData()));
     connect(socket, SIGNAL(disconnected()), this, SLOT(deleteLater()));
     currentDirectory = "/";
-    dataConnection = new DataConnection(this);
+    dataConnection = new DataConnection(certData, this);
+    this->certData = certData;
     reply("220 Welcome to QFtpServer.");
 }
 
@@ -45,7 +46,7 @@ void FtpControlConnection::acceptNewData()
     // of using a for-loop until no more lines are available. This is done
     // so we don't block the event loop for a long time.
     processCommand(QString::fromUtf8(socket->readLine()).trimmed());
-    QTimer::singleShot(0, this, SLOT(acceptNewData()));
+    //QTimer::singleShot(0, this, SLOT(acceptNewData()));
 }
 
 void FtpControlConnection::disconnectFromHost()
@@ -375,13 +376,12 @@ void FtpControlConnection::pass(const QString &password)
     } else {
          reply("530 User name or password was incorrect.");
     }
-
 }
 
 void FtpControlConnection::auth()
 {
     reply("234 Initializing SSL connection.");
-    SslServer::setLocalCertificateAndPrivateKey(socket);
+    SslServer::setLocalCertificateAndPrivateKey(socket,certData);
     socket->startServerEncryption();
 }
 

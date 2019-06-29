@@ -8,12 +8,23 @@ SslServer::SslServer(QObject *parent) :
 {
 }
 
-void SslServer::setLocalCertificateAndPrivateKey(QSslSocket *socket)
+//void SslServer::setLocalCertificateAndPrivateKey(QSslSocket *socket)
+//{
+//    socket->setPrivateKey(":/ssl/privkey.pem", QSsl::Rsa, QSsl::Pem, "39129380423984234012312");
+//    Q_ASSERT(!socket->privateKey().isNull());
+//    socket->setLocalCertificate(":/ssl/cacert.pem");
+//    Q_ASSERT(!socket->localCertificate().isNull());
+//}
+
+void SslServer::setLocalCertificateAndPrivateKey(QSslSocket *socket, const SslCertData & certData)
 {
-    socket->setPrivateKey(":/ssl/privkey.pem", QSsl::Rsa, QSsl::Pem, "39129380423984234012312");
-    Q_ASSERT(!socket->privateKey().isNull());
-    socket->setLocalCertificate(":/ssl/cacert.pem");
-    Q_ASSERT(!socket->localCertificate().isNull());
+    if(!certData.getLocalCertFilePath().isNull()){
+        socket->setPrivateKey(certData.getPrivateKeyFilePath(), QSsl::Rsa, QSsl::Pem, certData.getPassphrase());
+        Q_ASSERT(!socket->privateKey().isNull());
+        socket->setLocalCertificate(certData.getLocalCertFilePath());
+        Q_ASSERT(!socket->localCertificate().isNull());
+    }
+
 }
 
 void SslServer::incomingConnection(PortableSocketDescriptorType socketDescriptor)

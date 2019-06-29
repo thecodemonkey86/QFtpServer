@@ -1,6 +1,8 @@
 #ifndef SSLSERVER_H
 #define SSLSERVER_H
 
+#include "sslcertdata.h"
+
 #include <QTcpServer>
 
 class QSslSocket;
@@ -19,7 +21,8 @@ public:
     // Sets the local certificate and private key for the socket, so
     // startServerEncryption() can be used. We get the local certificate and
     // private key from the application's resources.
-    static void setLocalCertificateAndPrivateKey(QSslSocket *socket);
+//    static void setLocalCertificateAndPrivateKey(QSslSocket *socket);
+    static void setLocalCertificateAndPrivateKey(QSslSocket *socket,const SslCertData & certData);
 
 signals:
 

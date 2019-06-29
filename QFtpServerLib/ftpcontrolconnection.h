@@ -6,7 +6,7 @@
 
 #include <QObject>
 #include <QPointer>
-
+#include <functional>
 class QSslSocket;
 class FtpCommand;
 class DataConnection;
@@ -23,7 +23,7 @@ public:
     explicit FtpControlConnection(QObject *parent, QSslSocket *socket,  const SslCertData & certData, const QHash<QString, FtpConfig> & usersConfigsMapping, bool readOnly = false);
     ~FtpControlConnection();
 
-signals:
+    void onFileStored(const QString & filepath) const;
 
 public slots:
     // Slot used by the data connection handlers to send messages to the FTP
@@ -94,6 +94,7 @@ private:
     void cdup();
     // Server reports which features it supports.
     void feat();
+
     // If the previous command was REST, returns its value. The REST command
     // allows to the client to continue partially downloaded/uploaded files.
     qint64 seekTo();

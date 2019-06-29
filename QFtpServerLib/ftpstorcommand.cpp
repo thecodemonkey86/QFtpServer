@@ -1,3 +1,4 @@
+#include "ftpcontrolconnection.h"
 #include "ftpstorcommand.h"
 #include <QFile>
 #include <QSslSocket>
@@ -7,7 +8,7 @@ FtpStorCommand::FtpStorCommand(QObject *parent, const QString &fileName, bool ap
 {
     this->fileName = fileName;
     this->appendMode = appendMode;
-    file = 0;
+    file = nullptr;
     this->seekTo = seekTo;
     success = false;
 }
@@ -17,6 +18,7 @@ FtpStorCommand::~FtpStorCommand()
     if (started) {
         if (success) {
             emit reply("226 Closing data connection.");
+            file->deleteLater();
         } else {
             emit reply("451 Requested action aborted: local error in processing.");
         }
@@ -35,13 +37,13 @@ void FtpStorCommand::startImplementation()
     if (seekTo) {
         file->seek(seekTo);
     }
-    connect(socket, SIGNAL(readyRead()), this, SLOT(acceptNextBlock()));
+    connect(socket, &QIODevice::readyRead, this, &FtpStorCommand::acceptNextBlock);
 }
 
 void FtpStorCommand::acceptNextBlock()
 {
     const QByteArray &bytes = socket->readAll();
-    int bytesWritten = file->write(bytes);
+    qint64 bytesWritten = file->write(bytes);
     if (bytesWritten != bytes.size()) {
         emit reply("451 Requested action aborted. Could not write data to file.");
         deleteLater();

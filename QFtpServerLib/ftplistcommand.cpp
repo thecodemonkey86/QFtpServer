@@ -32,18 +32,6 @@ void FtpListCommand::startImplementation()
 
     emit reply("150 File status okay; about to open data connection.");
 
-   // index = 0;
-   /* list = new QFileInfoList;
-    if (!info.isDir()) {
-        *list = (QFileInfoList() << info);
-    } else {
-        *list = QDir(listDirectory).entryInfoList();
-    }
-
-    // Start the timer.
-    timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), this, SLOT(listNextBatch()));
-    timer->start(0);*/
     auto list = !info.isDir() ? (QFileInfoList() << info) : QDir(listDirectory).entryInfoList();
     for(const auto & l : list)
          socket->write(fileListingString(l).toUtf8());

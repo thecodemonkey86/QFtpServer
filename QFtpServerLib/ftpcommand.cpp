@@ -13,6 +13,6 @@ void FtpCommand::start(QSslSocket *socket)
     started = true;
     this->socket = socket;
     socket->setParent(this);
-    connect(socket, SIGNAL(disconnected()), this, SLOT(deleteLater()));
+    connect(socket, &QAbstractSocket::disconnected, this, &QObject::deleteLater);
     startImplementation();
 }

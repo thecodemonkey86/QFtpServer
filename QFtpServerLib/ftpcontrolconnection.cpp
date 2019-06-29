@@ -4,6 +4,7 @@
 #include "ftpstorcommand.h"
 #include "sslserver.h"
 #include "dataconnection.h"
+#include "ftpserver.h"
 
 #include <QFileInfo>
 #include <QDateTime>
@@ -24,8 +25,8 @@ FtpControlConnection::FtpControlConnection(QObject *parent, QSslSocket *socket, 
     isLoggedIn = false;
     encryptDataConnection = false;
     socket->setParent(this);
-    connect(socket, SIGNAL(readyRead()), this, SLOT(acceptNewData()));
-    connect(socket, SIGNAL(disconnected()), this, SLOT(deleteLater()));
+    connect(socket, &QIODevice::readyRead, this, &FtpControlConnection::acceptNewData);
+    connect(socket, &QAbstractSocket::disconnected, this, &QObject::deleteLater);
     currentDirectory = "/";
     dataConnection = new DataConnection(certData, this);
     this->certData = certData;
@@ -34,6 +35,11 @@ FtpControlConnection::FtpControlConnection(QObject *parent, QSslSocket *socket, 
 
 FtpControlConnection::~FtpControlConnection()
 {
+}
+
+void FtpControlConnection::onFileStored(const QString &filepath) const
+{
+    qobject_cast<FtpServer*>(parent())->onFileStored(filepath);
 }
 
 void FtpControlConnection::acceptNewData()
@@ -240,7 +246,7 @@ void FtpControlConnection::processCommand(const QString &entireCommand)
 
 void FtpControlConnection::startOrScheduleCommand(FtpCommand *ftpCommand)
 {
-    connect(ftpCommand, SIGNAL(reply(QString)), this, SLOT(reply(QString)));
+    connect(ftpCommand, &FtpCommand::reply, this, &FtpControlConnection::reply);
 
     if (!dataConnection->setFtpCommand(ftpCommand)) {
         delete ftpCommand;
@@ -258,7 +264,7 @@ void FtpControlConnection::port(const QString &addressAndPort)
     QRegExp exp("\\s*(\\d+,\\d+,\\d+,\\d+),(\\d+),(\\d+)");
     exp.indexIn(addressAndPort);
     QString hostName = exp.cap(1).replace(',', '.');
-    int port = exp.cap(2).toInt() * 256 + exp.cap(3).toInt();
+    quint16 port = exp.cap(2).toUShort() * 256 + exp.cap(3).toUShort();
     dataConnection->scheduleConnectToHost(hostName, port, encryptDataConnection);
     reply("200 Command okay.");
 }
@@ -281,7 +287,15 @@ void FtpControlConnection::retr(const QString &fileName)
 
 void FtpControlConnection::stor(const QString &fileName, bool appendMode)
 {
-    startOrScheduleCommand(new FtpStorCommand(this, fileName, appendMode, seekTo()));
+    auto storCommand = new FtpStorCommand(this, fileName, appendMode, seekTo());
+    connect(storCommand,&FtpStorCommand::reply,[this, fileName](const QString &details){
+        if(details.startsWith("226"))
+        {
+            qobject_cast<FtpServer*>(parent())->onFileStored(toLocalPath(fileName));
+        }
+
+    });
+    startOrScheduleCommand(storCommand);
 }
 
 void FtpControlConnection::cwd(const QString &dir)
@@ -345,7 +359,7 @@ void FtpControlConnection::quit()
     // If we have a running download or upload, we will wait until it's
     // finished before closing the control connection.
     if (dataConnection->ftpCommand()) {
-        connect(dataConnection->ftpCommand(), SIGNAL(destroyed()), this, SLOT(disconnectFromHost()));
+        connect(dataConnection->ftpCommand(), &QObject::destroyed, this, &FtpControlConnection::disconnectFromHost);
     } else {
         disconnectFromHost();
     }
@@ -416,8 +430,9 @@ void FtpControlConnection::feat()
         "211-Features:\r\n"
         " UTF8\r\n"
         "211 End\r\n"
-    );
+                );
 }
+
 
 qint64 FtpControlConnection::seekTo()
 {

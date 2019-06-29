@@ -11,7 +11,7 @@ class FtpCommand : public QObject
 {
     Q_OBJECT
 public:
-    explicit FtpCommand(QObject *parent = 0);
+    explicit FtpCommand(QObject *parent = nullptr);
 
 signals:
     void reply(const QString &details);

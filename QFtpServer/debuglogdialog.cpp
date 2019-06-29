@@ -3,18 +3,10 @@
 
 static DebugLogDialog *theDialog = 0;
 
-// The message handler's signature has changed in Qt5.
-#if QT_VERSION >= 0x050000
 static void myMessageOutput(QtMsgType /*type*/, const QMessageLogContext &/*context*/, const QString &msg)
 {
     theDialog->appendText(msg);
 }
-#else
-static void myMessageOutput(QtMsgType /*type*/, const char *msg)
-{
-    theDialog->appendText(msg);
-}
-#endif
 
 DebugLogDialog::DebugLogDialog(QWidget *parent) :
     QDialog(parent),
@@ -23,22 +15,12 @@ DebugLogDialog::DebugLogDialog(QWidget *parent) :
     ui->setupUi(this);
     theDialog = this;
 
-    // The message handler's signature has changed in Qt5.
-#if QT_VERSION >= 0x050000
     qInstallMessageHandler(myMessageOutput);
-#else
-    qInstallMsgHandler(myMessageOutput);
-#endif
 }
 
 DebugLogDialog::~DebugLogDialog()
 {
-    // The message handler's signature has changed in Qt5.
-#if QT_VERSION >= 0x050000
-    qInstallMessageHandler(0);
-#else
-    qInstallMsgHandler(0);
-#endif
+    qInstallMessageHandler(nullptr);
     delete ui;
 }
 
@@ -57,7 +39,6 @@ void DebugLogDialog::setOrientation(ScreenOrientation orientation)
 
     Qt::WidgetAttribute attribute;
     switch (orientation) {
-#if QT_VERSION < 0x040702 || QT_VERSION >= 0x050000
     // Qt < 4.7.2 does not yet have the Qt::WA_*Orientation attributes
     // Qt 5 has removed them.
     case ScreenOrientationLockPortrait:
@@ -66,22 +47,9 @@ void DebugLogDialog::setOrientation(ScreenOrientation orientation)
     case ScreenOrientationLockLandscape:
         attribute = static_cast<Qt::WidgetAttribute>(129);
         break;
-    default:
     case ScreenOrientationAuto:
         attribute = static_cast<Qt::WidgetAttribute>(130);
         break;
-#else // QT_VERSION < 0x040702
-    case ScreenOrientationLockPortrait:
-        attribute = Qt::WA_LockPortraitOrientation;
-        break;
-    case ScreenOrientationLockLandscape:
-        attribute = Qt::WA_LockLandscapeOrientation;
-        break;
-    default:
-    case ScreenOrientationAuto:
-        attribute = Qt::WA_AutoOrientation;
-        break;
-#endif // QT_VERSION < 0x040702
     };
     setAttribute(attribute, true);
 }

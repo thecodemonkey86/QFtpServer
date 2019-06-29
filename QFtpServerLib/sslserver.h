@@ -32,11 +32,7 @@ private:
     // QTcpServer::incomingConnection(qintptr handle) this 2nd one is sneaky as it
     // compiles properly but no connections appear to arrive since the compiler
     // doesn’t consider int and qintptr the same.
-#if QT_VERSION >= 0x050000
     typedef qintptr PortableSocketDescriptorType;
-#else
-    typedef int PortableSocketDescriptorType;
-#endif
 
     void incomingConnection(PortableSocketDescriptorType socketDescriptor);
 };

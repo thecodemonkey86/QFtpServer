@@ -14,12 +14,8 @@ FtpServer::FtpServer(QObject *parent, const QHash<QString, FtpConfig> & usersCon
     // In Qt4, QHostAddress::Any listens for IPv4 connections only, but as of
     // Qt5, it now listens on all available interfaces, and
     // QHostAddress::AnyIPv4 needs to be used if we want only IPv4 connections.
-#if QT_VERSION >= 0x050000
     server->listen(QHostAddress::AnyIPv4, port);
-#else
-    server->listen(QHostAddress::Any, port);
-#endif
-    connect(server, SIGNAL(newConnection()), this, SLOT(startNewControlConnection()));
+    connect(server, &QTcpServer::newConnection, this, &FtpServer::startNewControlConnection);
     this->usersConfigMapping = usersConfigMapping;
     this->readOnly = readOnly;
     this->onlyOneIpAllowed = onlyOneIpAllowed;
@@ -44,6 +40,11 @@ QString FtpServer::lanIp()
         }
     }
     return "";
+}
+
+void FtpServer::onFileStored(const QString &filepath) const
+{
+    emit fileStored(filepath);
 }
 
 void FtpServer::startNewControlConnection()

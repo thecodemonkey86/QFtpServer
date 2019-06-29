@@ -33,13 +33,14 @@ public:
 
     // Get the LAN IP of the host, e.g. "192.168.1.10".
     static QString lanIp();
-
+    void  onFileStored(const QString & filepath) const;
 signals:
     // A connection from a new IP has been established. This signal is emitted
     // when the FTP server is connected by a new IP. The new IP will then be
     // stored and will not cause this FTP server instance to emit this signal
     // any more.
     void newPeerIp(const QString &ip);
+   void fileStored(const QString & filepath) const;
 
 private slots:
     // Called by the SSL server when we have received a new connection.

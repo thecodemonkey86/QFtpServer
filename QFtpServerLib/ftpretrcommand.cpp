@@ -7,7 +7,7 @@ FtpRetrCommand::FtpRetrCommand(QObject *parent, const QString &fileName, qint64 
 {
     this->fileName = fileName;
     this->seekTo = seekTo;
-    file = 0;
+    file = nullptr;
 }
 
 FtpRetrCommand::~FtpRetrCommand()
@@ -36,9 +36,9 @@ void FtpRetrCommand::startImplementation()
     // For encryted SSL sockets, we need to use the encryptedBytesWritten()
     // signal, see the QSslSocket documentation to for reasons why.
     if (socket->isEncrypted()) {
-        connect(socket, SIGNAL(encryptedBytesWritten(qint64)), this, SLOT(refillSocketBuffer(qint64)));
+        connect(socket, &QSslSocket::encryptedBytesWritten, this, &FtpRetrCommand::refillSocketBuffer);
     } else {
-        connect(socket, SIGNAL(bytesWritten(qint64)), this, SLOT(refillSocketBuffer(qint64)));
+        connect(socket, &QIODevice::bytesWritten, this, &FtpRetrCommand::refillSocketBuffer);
     }
 
     refillSocketBuffer(128*1024);

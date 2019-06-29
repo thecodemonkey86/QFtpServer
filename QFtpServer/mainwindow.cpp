@@ -40,7 +40,7 @@ MainWindow::MainWindow(QWidget *parent)
     setWindowIcon(QIcon(":/icons/appicon"));
 
     loadSettings();
-    server = 0;
+    server = nullptr;
     startServer();
 }
 
@@ -65,31 +65,15 @@ void MainWindow::setOrientation(ScreenOrientation orientation)
 
     Qt::WidgetAttribute attribute;
     switch (orientation) {
-#if QT_VERSION < 0x040702 || QT_VERSION >= 0x050000
-    // Qt < 4.7.2 does not yet have the Qt::WA_*Orientation attributes
-    // Qt 5 has removed them.
     case ScreenOrientationLockPortrait:
         attribute = static_cast<Qt::WidgetAttribute>(128);
         break;
     case ScreenOrientationLockLandscape:
         attribute = static_cast<Qt::WidgetAttribute>(129);
         break;
-    default:
     case ScreenOrientationAuto:
         attribute = static_cast<Qt::WidgetAttribute>(130);
         break;
-#else // QT_VERSION < 0x040702
-    case ScreenOrientationLockPortrait:
-        attribute = Qt::WA_LockPortraitOrientation;
-        break;
-    case ScreenOrientationLockLandscape:
-        attribute = Qt::WA_LockLandscapeOrientation;
-        break;
-    default:
-    case ScreenOrientationAuto:
-        attribute = Qt::WA_AutoOrientation;
-        break;
-#endif // QT_VERSION < 0x040702
     };
     setAttribute(attribute, true);
 }
@@ -150,7 +134,7 @@ void MainWindow::startServer()
     usersConfigsMappings.insert(userName, FtpConfig(ui->lineEditRootPath->text(), password));
     delete server;
     server = new FtpServer(this,usersConfigsMappings , ui->lineEditPort->text().toInt(), ui->checkBoxReadOnly->isChecked(), ui->checkBoxOnlyOneIpAllowed->isChecked());
-    connect(server, SIGNAL(newPeerIp(QString)), SLOT(onPeerIpChanged(QString)));
+    connect(server, &FtpServer::newPeerIp, this, &MainWindow::onPeerIpChanged);
     if (server->isListening()) {
         ui->statusBar->showMessage("Listening at " + FtpServer::lanIp());
     } else {

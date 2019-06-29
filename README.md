@@ -34,4 +34,4 @@ It doesn't support:
     usersConfigsMappings.insert(userName, FtpConfig(rootPath, password));
     usersConfigsMappings.insert(userName2, FtpConfig(rootPath2, password2));
    
-    FtpServer server(&a, usersConfigsMappings, 21, false, false);
+   FtpServer server(&a, usersConfigsMappings, SslCertData(QDir(a.applicationDirPath()).absoluteFilePath("private_key.pem"),QDir(a.applicationDirPath()).absoluteFilePath("cert.pem"),QByteArray("39129380423984234012312")),2121, false, false);

@@ -291,7 +291,7 @@ void FtpControlConnection::stor(const QString &fileName, bool appendMode)
     connect(storCommand,&FtpStorCommand::reply,[this, fileName](const QString &details){
         if(details.startsWith("226"))
         {
-            qobject_cast<FtpServer*>(parent())->onFileStored(toLocalPath(fileName));
+            qobject_cast<FtpServer*>(parent())->onFileStored(fileName);
         }
 
     });

@@ -25,8 +25,6 @@ public:
                         quint16 port = 21,
                        bool readOnly = false, bool onlyOneIpAllowed = false);
 
-    virtual ~FtpServer();
-
     // Whether or not the server is listening for incoming connections. If it
     // is not currently listening then there was an error - probably no
     // internet connection is available, or the port address might require root

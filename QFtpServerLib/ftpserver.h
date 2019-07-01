@@ -30,7 +30,7 @@ public:
     // internet connection is available, or the port address might require root
     // priviledges (on Linux).
     bool isListening();
-
+    quint16 getPort() const;
     // Get the LAN IP of the host, e.g. "192.168.1.10".
     static QString lanIp();
     void  onFileStored(const QString & filepath) const;

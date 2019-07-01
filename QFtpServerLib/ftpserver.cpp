@@ -29,7 +29,12 @@ FtpServer::FtpServer(QObject *parent, const QHash<QString, FtpConfig> &usersConf
 
 bool FtpServer::isListening()
 {
-    return server->isListening();
+  return server->isListening();
+}
+
+quint16 FtpServer::getPort() const
+{
+  return server->serverPort();
 }
 
 QString FtpServer::lanIp()

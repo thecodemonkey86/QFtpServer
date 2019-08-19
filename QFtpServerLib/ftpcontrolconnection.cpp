@@ -37,10 +37,6 @@ FtpControlConnection::~FtpControlConnection()
 {
 }
 
-void FtpControlConnection::onFileStored(const QString &filepath) const
-{
-    qobject_cast<FtpServer*>(parent())->onFileStored(filepath);
-}
 
 void FtpControlConnection::acceptNewData()
 {
@@ -288,12 +284,8 @@ void FtpControlConnection::retr(const QString &fileName)
 void FtpControlConnection::stor(const QString &fileName, bool appendMode)
 {
     auto storCommand = new FtpStorCommand(this, fileName, appendMode, seekTo());
-    connect(storCommand,&FtpStorCommand::reply,[this, fileName](const QString &details){
-        if(details.startsWith("226"))
-        {
-            qobject_cast<FtpServer*>(parent())->onFileStored(fileName);
-        }
-
+    connect(storCommand,&FtpStorCommand::reply,this,[this,fileName](const QString &){
+        qobject_cast<FtpServer*>(parent())->storeCommandFinished(fileName);
     });
     startOrScheduleCommand(storCommand);
 }

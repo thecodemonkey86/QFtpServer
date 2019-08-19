@@ -17,6 +17,7 @@ FtpStorCommand::~FtpStorCommand()
 {
     if (started) {
         if (success) {
+            file->close();
             emit reply("226 Closing data connection.");
             file->deleteLater();
         } else {

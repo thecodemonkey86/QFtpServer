@@ -33,7 +33,6 @@ public:
     quint16 getPort() const;
     // Get the LAN IP of the host, e.g. "192.168.1.10".
     static QString lanIp();
-    void  onFileStored(const QString & filepath) const;
 signals:
     // A connection from a new IP has been established. This signal is emitted
     // when the FTP server is connected by a new IP. The new IP will then be
@@ -45,7 +44,8 @@ signals:
 private slots:
     // Called by the SSL server when we have received a new connection.
     void startNewControlConnection();
-
+public slots:
+    void storeCommandFinished(const QString & filepath) const;
 private:
     // mapping user name to FTP server configuration, which contains password and root path for that user
     QHash<QString, FtpConfig> usersConfigMapping;

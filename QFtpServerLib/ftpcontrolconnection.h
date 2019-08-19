@@ -23,8 +23,6 @@ public:
     explicit FtpControlConnection(QObject *parent, QSslSocket *socket,  const SslCertData & certData, const QHash<QString, FtpConfig> & usersConfigsMapping, bool readOnly = false);
     ~FtpControlConnection();
 
-    void onFileStored(const QString & filepath) const;
-
 public slots:
     // Slot used by the data connection handlers to send messages to the FTP
     // client through the control connection.

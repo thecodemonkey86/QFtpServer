@@ -47,7 +47,7 @@ QString FtpServer::lanIp()
     return "";
 }
 
-void FtpServer::onFileStored(const QString &filepath) const
+void FtpServer::storeCommandFinished(const QString &filepath) const
 {
     emit fileStored(filepath);
 }

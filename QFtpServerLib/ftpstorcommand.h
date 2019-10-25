@@ -14,7 +14,8 @@ class FtpStorCommand : public FtpCommand
 public:
     explicit FtpStorCommand(QObject *parent, const QString &fileName, bool appendMode = false, qint64 seekTo = 0);
     ~FtpStorCommand();
-
+  signals:
+  void closeCommand();
 private slots:
     void acceptNextBlock();
 

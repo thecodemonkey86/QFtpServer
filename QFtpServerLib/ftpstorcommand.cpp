@@ -19,6 +19,7 @@ FtpStorCommand::~FtpStorCommand()
         if (success) {
             file->close();
             emit reply("226 Closing data connection.");
+            emit closeCommand();
             file->deleteLater();
         } else {
             emit reply("451 Requested action aborted: local error in processing.");

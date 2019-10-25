@@ -284,8 +284,9 @@ void FtpControlConnection::retr(const QString &fileName)
 void FtpControlConnection::stor(const QString &fileName, bool appendMode)
 {
     auto storCommand = new FtpStorCommand(this, fileName, appendMode, seekTo());
-    connect(storCommand,&FtpStorCommand::reply,this,[this,fileName](const QString &){
-        qobject_cast<FtpServer*>(parent())->storeCommandFinished(fileName);
+    connect(storCommand,&FtpStorCommand::closeCommand,this,[this,fileName](){
+       qobject_cast<FtpServer*>(parent())->storeCommandFinished(fileName);
+
     });
     startOrScheduleCommand(storCommand);
 }
